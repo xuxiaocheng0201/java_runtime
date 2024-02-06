@@ -1,0 +1,17 @@
+[package]
+name = "java8"
+version = "0.0.1"
+authors = ["xuxiaocheng <2762267080@qq.com>"]
+edition = "2021"
+description = "An additional crate for j4rs, providing jre8."
+license = "MIT OR Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+java-locator = "~0.1"
+thiserror = "^1"
+ureq = "^2"
+tempfile = "^3"
+sha1 = "~0.10"
+zip = "~0.6"

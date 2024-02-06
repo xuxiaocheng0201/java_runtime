@@ -1,0 +1,13 @@
+/*
+
+### Cargo ###
+!/.gitignore
+!/Cargo.lock
+!/Cargo.toml
+
+### Project ###
+!/src
+!/LICENSE-MIT
+!/LICENSE-APACHE
+!/README.md
+!/README_zh.md
