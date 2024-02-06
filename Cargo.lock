@@ -295,7 +295,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "java8"
+name = "java_runtime"
 version = "0.0.1"
 dependencies = [
  "java-locator",

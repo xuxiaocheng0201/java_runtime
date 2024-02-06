@@ -1,12 +1,14 @@
 [package]
-name = "java8"
+name = "java_runtime"
 version = "0.0.1"
 authors = ["xuxiaocheng <2762267080@qq.com>"]
 edition = "2021"
 description = "An additional crate for j4rs, providing jre8."
+readme = "README.md"
 license = "MIT OR Apache-2.0"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+repository = "https://github.com/xuxiaocheng0201/java_runtime"
+documentation = "https://docs.rs/tcp-server/"
+keywords = ["java", "runtime", "j4rs"]
 
 [dependencies]
 java-locator = "~0.1"
@@ -15,3 +17,6 @@ ureq = "^2"
 tempfile = "^3"
 sha1 = "~0.10"
 zip = "~0.6"
+
+[badges]
+maintenance = { status = "actively-developed" }

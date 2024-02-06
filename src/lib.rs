@@ -1,3 +1,5 @@
+pub extern crate java_locator;
+
 use std::env::set_var;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, copy, Seek, SeekFrom};
