@@ -1,12 +1,11 @@
+pub mod util;
+
 pub extern crate java_locator;
 
 use std::env::set_var;
 use std::fs::File;
-use std::io::{BufReader, BufWriter, copy, Seek, SeekFrom};
+use std::io::{Seek, SeekFrom};
 use std::path::Path;
-use sha1::{Digest, Sha1};
-use tempfile::tempfile;
-use thiserror::Error;
 
 #[cfg(not(windows))]
 compile_error!("This crate is only supported on Windows now.");
@@ -50,7 +49,7 @@ const fn select_url() -> Option<(&'static str, &'static str)> {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Error, Debug)]
+#[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("Unsupported OS.")]
     UnsupportedOs(()),
@@ -62,24 +61,18 @@ pub enum Error {
     UnzipError(#[from] zip::result::ZipError),
 }
 
-fn download_file(url: &str, file: &mut File) -> Result<()> {
-    let mut reader = ureq::get(url).call()?.into_reader();
-    let mut writer = BufWriter::new(file);
-    copy(&mut reader, &mut writer)?;
-    Ok(())
+pub fn download_java8() -> Result<File> {
+    let (url, hash) = select_url().ok_or(Error::UnsupportedOs(()))?;
+    let mut file = tempfile::tempfile()?;
+    util::download_file(url, &mut file)?;
+    file.seek(SeekFrom::Start(0))?;
+    if hash != &util::hash_file_sha1(&mut file)? {
+        return Err(Error::IOError(std::io::Error::new(std::io::ErrorKind::Other, "hash mismatch")));
+    }
+    file.seek(SeekFrom::Start(0))?;
+    Ok(file)
 }
 
-fn hash_file(file: &mut File) -> std::io::Result<String> {
-    let mut reader = BufReader::new(file);
-    let mut hasher = Sha1::new();
-    copy(&mut reader, &mut hasher)?;
-    let hash = hasher.finalize();
-    let hash = hash.iter().map(|b| format!("{:02x}", b)).collect::<Vec<_>>().join("");
-    println!("{}", hash);
-    Ok(hash)
-}
-
-// Install options: https://docs.oracle.com/javase/8/docs/technotes/guides/install/config.html#table_config_file_options
 pub fn prepare_java8() -> Result<()> {
     if let Ok(_) = java_locator::locate_java_home() {
         return Ok(());
@@ -88,15 +81,7 @@ pub fn prepare_java8() -> Result<()> {
         set_var("JAVA_HOME", "./java/jdk8u402");
         return Ok(()); // TODO: Check valid.
     }
-    let (url, hash) = select_url().ok_or(Error::UnsupportedOs(()))?;
-    println!("{}", hash);
-    let mut file = tempfile()?;
-    download_file(url, &mut file)?;
-    file.seek(SeekFrom::Start(0))?;
-    if hash != &hash_file(&mut file)? {
-        return Err(Error::IOError(std::io::Error::new(std::io::ErrorKind::Other, "Hash mismatch")));
-    }
-    file.seek(SeekFrom::Start(0))?;
+    let mut file = download_java8()?;
     zip::ZipArchive::new(&mut file)?.extract("./java")?;
     set_var("JAVA_HOME", "./java/jdk8u402");
     Ok(())
@@ -109,5 +94,6 @@ mod tests {
     #[test]
     fn test() {
         prepare_java8().unwrap();
+        assert!(java_locator::locate_java_home().is_ok());
     }
 }

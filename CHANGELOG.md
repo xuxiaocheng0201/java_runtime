@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+* 暴露更多函数。
+
+### Fixed
+
+* 修复路径检测错误。
+* 移除错误注释。
+
 ## [0.0.1] - 2024-2-6
 
 ### Added
