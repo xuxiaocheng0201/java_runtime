@@ -84,7 +84,8 @@ pub fn prepare_java8() -> Result<()> {
     if let Ok(_) = java_locator::locate_java_home() {
         return Ok(());
     }
-    if Path::new("./java").is_dir() {
+    if Path::new("./java/jdk8u402").is_dir() {
+        set_var("JAVA_HOME", "./java/jdk8u402");
         return Ok(()); // TODO: Check valid.
     }
     let (url, hash) = select_url().ok_or(Error::UnsupportedOs(()))?;
@@ -96,8 +97,8 @@ pub fn prepare_java8() -> Result<()> {
         return Err(Error::IOError(std::io::Error::new(std::io::ErrorKind::Other, "Hash mismatch")));
     }
     file.seek(SeekFrom::Start(0))?;
-    zip::ZipArchive::new(&mut file)?.extract("./")?;
-    set_var("JAVA_HOME", "./jdk8u402");
+    zip::ZipArchive::new(&mut file)?.extract("./java")?;
+    set_var("JAVA_HOME", "./java/jdk8u402");
     Ok(())
 }
 
